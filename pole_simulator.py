@@ -9,7 +9,7 @@ cart_mass = 1
 pole_mass = 0.1
 pole_length = 0.5
 track_limit = 2.4
-failure_angle = 0.1  # radians
+failure_angle = 0.2  # radians
 time_step = 0.001
 
 
@@ -31,15 +31,15 @@ def get_pos_accel(angle, angle_speed, angle_accel, force):
 
 log = False
 
-p_range = 20
+p_range = 200
 d_range = 200
-target_angle = 0.02
+target_angle = 0.05
 x = []
 angles = []
-for p in range(p_range):
+for p in [199]:
     print(p)
-    for d in range(d_range):
-        angle = -0.05
+    for d in [16]:
+        angle = -0.1
         angle_speed = 0
         pos = 0
         pos_speed = 0
@@ -48,8 +48,8 @@ for p in range(p_range):
         e = []
         for _ in range(10000):
             p_error = angle - target_angle
-            e.append(abs(p_error))
             d_error = angle_speed if (angle > target_angle or angle < 0) else -angle_speed
+            e.append(abs(p_error))
             force = (p_error * p) + (d_error * d)
             angle_accel = get_angle_accel(angle, angle_speed, force)
             pos_accel = get_pos_accel(angle, angle_speed, angle_accel, force)
@@ -75,7 +75,7 @@ for p in range(p_range):
             time += time_step
         x.append(np.mean(e))
 
-print(np.unravel_index(np.argmin(x), (p_range, d_range)))
-print(np.amin(x))
-# plt.plot(angles)
-# plt.show()
+# print(np.amin(x))
+# print(np.unravel_index(np.argmin(x), (p_range, d_range)))
+plt.plot(angles)
+plt.show()
