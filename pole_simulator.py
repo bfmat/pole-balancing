@@ -2,6 +2,7 @@
 
 import math
 import matplotlib.pyplot as plt
+import numpy as np
 
 gravity = 9.81
 cart_mass = 1
@@ -28,7 +29,7 @@ def get_pos_accel(angle, angle_speed, angle_accel, force):
     )
 
 
-x = []
+x = np.zeros((100, 100))
 for p in range(100):
     for d in range(100):
         angle = 0.01
@@ -56,10 +57,11 @@ for p in range(100):
             # print()
             if abs(angle) > failure_angle or abs(pos) > track_limit:
                 # print('Failure')
-                x.append(time)
+                x[p, d] = time
                 break
             time += time_step
 
-print(max(x))
-plt.plot(x)
-plt.show()
+print(np.unravel_index(np.argmax(x), x.shape))
+print(np.amax(x))
+# plt.plot(x)
+# plt.show()
