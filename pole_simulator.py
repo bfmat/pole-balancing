@@ -32,11 +32,12 @@ def get_pos_accel(angle, angle_speed, angle_accel, force):
 log = False
 
 p_range = 20
-d_range = 100
+d_range = 200
 target_angle = 0.02
 x = []
 angles = []
 for p in range(p_range):
+    print(p)
     for d in range(d_range):
         angle = -0.05
         angle_speed = 0
@@ -44,7 +45,7 @@ for p in range(p_range):
         pos_speed = 0
         force = 0
         time = 0
-        for _ in range(10000):
+        for _ in range(40000):
             p_error = angle - target_angle
             d_error = angle_speed if (angle > target_angle or angle < 0) else -angle_speed
             force = (p_error * p) + (d_error * d)
