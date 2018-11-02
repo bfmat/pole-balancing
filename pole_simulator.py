@@ -33,12 +33,12 @@ log = False
 
 p_range = 200
 d_range = 200
-target_angle = 0.05
+target_angle = 0.1
 x = []
 angles = []
-for p in [199]:
+for p in range(-p_range, p_range):
     print(p)
-    for d in [16]:
+    for d in range(-d_range, d_range):
         angle = -0.1
         angle_speed = 0
         pos = 0
@@ -46,10 +46,10 @@ for p in [199]:
         force = 0
         time = 0
         e = []
-        for _ in range(10000):
+        for _ in range(20000):
             p_error = angle - target_angle
             d_error = angle_speed if (angle > target_angle or angle < 0) else -angle_speed
-            e.append(abs(p_error))
+            e.append(p_error ** 2)
             force = (p_error * p) + (d_error * d)
             angle_accel = get_angle_accel(angle, angle_speed, force)
             pos_accel = get_pos_accel(angle, angle_speed, angle_accel, force)
@@ -75,7 +75,7 @@ for p in [199]:
             time += time_step
         x.append(np.mean(e))
 
-# print(np.amin(x))
-# print(np.unravel_index(np.argmin(x), (p_range, d_range)))
-plt.plot(angles)
-plt.show()
+print(np.amin(x))
+print(np.unravel_index(np.argmin(x), (p_range * 2, d_range * 2)))
+# plt.plot(angles)
+# plt.show()
