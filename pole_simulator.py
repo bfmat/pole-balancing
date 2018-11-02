@@ -34,7 +34,8 @@ log = False
 p_range = 200
 d_range = 200
 target_angle = 0.1
-x = []
+results = []
+parameters = []
 angles = []
 for p in range(-p_range, p_range):
     print(p)
@@ -49,7 +50,7 @@ for p in range(-p_range, p_range):
         for _ in range(20000):
             p_error = angle - target_angle
             d_error = angle_speed if (angle > target_angle or angle < 0) else -angle_speed
-            e.append(p_error ** 2)
+            e.append(abs(p_error))
             force = (p_error * p) + (d_error * d)
             angle_accel = get_angle_accel(angle, angle_speed, force)
             pos_accel = get_pos_accel(angle, angle_speed, angle_accel, force)
@@ -73,9 +74,11 @@ for p in range(-p_range, p_range):
                     print('Failure')
                 break
             time += time_step
-        x.append(np.mean(e))
+        if len(e) == 20000:
+            results.append(np.mean(e))
+            parameters.append((p, d))
 
-print(np.amin(x))
-print(np.unravel_index(np.argmin(x), (p_range * 2, d_range * 2)))
+print(min(results))
+print(parameters[results.index(min(results))])
 # plt.plot(angles)
 # plt.show()
