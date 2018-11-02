@@ -33,10 +33,11 @@ log = False
 
 p_range = 200
 d_range = 200
-target_angle = 0.1
+target_angle = 0
 results = []
 parameters = []
 angles = []
+time_steps = 40_000
 for p in range(-p_range, p_range):
     print(p)
     for d in range(-d_range, d_range):
@@ -47,9 +48,9 @@ for p in range(-p_range, p_range):
         force = 0
         time = 0
         e = []
-        for _ in range(20000):
+        for _ in range(time_steps):
             p_error = angle - target_angle
-            d_error = angle_speed if (angle > target_angle or angle < 0) else -angle_speed
+            d_error = angle_speed
             e.append(abs(p_error))
             force = (p_error * p) + (d_error * d)
             angle_accel = get_angle_accel(angle, angle_speed, force)
@@ -74,7 +75,7 @@ for p in range(-p_range, p_range):
                     print('Failure')
                 break
             time += time_step
-        if len(e) == 20000:
+        if len(e) == time_steps:
             results.append(np.mean(e))
             parameters.append((p, d))
 
