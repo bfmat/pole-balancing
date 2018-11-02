@@ -10,7 +10,7 @@ pole_mass = 0.1
 pole_length = 0.5
 track_limit = 2.4
 failure_angle = 0.209  # radians
-time_step = 0.02
+time_step = 0.01
 
 
 def get_angle_accel(angle, angle_speed, force):
@@ -29,15 +29,15 @@ def get_pos_accel(angle, angle_speed, angle_accel, force):
     )
 
 
-log = True
+log = False
 
 p_range = 20
 d_range = 100
 target_angle = 0.02
 x = []
 angles = []
-for p in [12]:
-    for d in [68]:
+for p in range(p_range):
+    for d in range(d_range):
         angle = -0.05
         angle_speed = 0
         pos = 0
@@ -72,7 +72,7 @@ for p in [12]:
                 break
             time += time_step
 
-# print(np.unravel_index(np.argmax(x), (p_range, d_range)))
-# print(np.amax(x))
-plt.plot(angles)
-plt.show()
+print(np.unravel_index(np.argmax(x), (p_range, d_range)))
+print(np.amax(x))
+# plt.plot(angles)
+# plt.show()
