@@ -10,7 +10,7 @@ pole_mass = 0.1
 pole_length = 0.5
 track_limit = 2.4
 failure_angle = 0.209  # radians
-time_step = 0.01
+time_step = 0.001
 
 
 def get_angle_accel(angle, angle_speed, force):
