@@ -33,14 +33,14 @@ log = False
 
 p_range = 200
 d_range = 200
-target_angle = 0
+target_angle = -0.15
 results = []
 parameters = []
 angles = []
 time_steps = 40_000
-for p in range(-p_range, p_range):
+for p in [136]:
     print(p)
-    for d in range(-d_range, d_range):
+    for d in [12]:
         angle = -0.1
         angle_speed = 0
         pos = 0
@@ -79,7 +79,7 @@ for p in range(-p_range, p_range):
             results.append(np.mean(e))
             parameters.append((p, d))
 
-print(min(results))
-print(parameters[results.index(min(results))])
-# plt.plot(angles)
-# plt.show()
+# print(min(results))
+# print(parameters[results.index(min(results))])
+plt.plot(angles)
+plt.show()
