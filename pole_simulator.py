@@ -29,7 +29,7 @@ def get_pos_accel(angle, angle_speed, angle_accel, force):
     )
 
 
-log = False
+log = True
 
 p_range = 200
 d_range = 200
