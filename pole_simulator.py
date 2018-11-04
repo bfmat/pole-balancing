@@ -29,7 +29,7 @@ def get_pos_accel(angle, angle_speed, angle_accel, force):
     )
 
 
-log = True
+log = False
 
 p_range = 200
 d_range = 200
@@ -41,9 +41,9 @@ time_steps = 40_000
 p = 136
 d = 12
 positions = []
-# for pos_p in np.linspace(-0.01, 0, 200):
-for pos_p in [-0.02]:
-    for pos_d in [-0.1]:
+for pos_p in np.linspace(-0.2, 0, 50):
+    print(pos_p)
+    for pos_d in np.linspace(-0.5, 0, 50):
         angle = 0.1
         angle_speed = 0
         pos = 3
@@ -84,11 +84,11 @@ for pos_p in [-0.02]:
         if len(e) == time_steps:
             results.append(np.mean(e))
             positions.append(np.mean(f))
-            parameters.append((p, d, pos_p))
+            parameters.append((p, d, pos_p, pos_d))
 
 print(min(positions))
 print(parameters[positions.index(min(positions))])
 # print(min(results))
 # print(parameters[results.index(min(results))])
-plt.plot(f)
-plt.show()
+# plt.plot(f)
+# plt.show()
