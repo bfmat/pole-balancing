@@ -9,7 +9,7 @@ cart_mass = 1
 pole_mass = 0.1
 pole_length = 0.5
 track_limit = 2.4
-failure_angle = 0.2  # radians
+failure_angle = 0.5  # radians
 time_step = 0.001
 
 
@@ -33,7 +33,7 @@ log = True
 
 p_range = 200
 d_range = 200
-target_angle = -0.15
+target_angle = -0.3
 results = []
 parameters = []
 angles = []
