@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
 import math
+
+import control
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -29,7 +31,21 @@ def get_pos_accel(angle, angle_speed, angle_accel, force):
     )
 
 
-log = True
+# State space control matrices (linearized)
+A = np.array([[1, 1, 0, 0], [gravity * pole_length, 1, 0, 0], [0, 0, 1, 1], [0, 0, 0, 1]])
+B = np.array([[0], [-1], [0], [1]])
+Q = 0.1 * np.diag([1 / (failure_angle ** 2), 1 / (0.3 ** 2), 1 / (track_limit ** 2), 1 / (5 ** 2)])
+R = np.array([[1 / (20 ** 2)]])
+# Calculate LQR optimal control policy
+K, _, _ = control.lqr(A, B, Q, R)
+# Example calculation
+x = -1 * np.array([[0.1], [0], [3], [0]])
+print(np.matmul(K, x))
+
+import sys
+sys.exit()
+
+log = False
 
 time_steps = 40_000
 p = 136
