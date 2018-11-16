@@ -42,10 +42,7 @@ K, _, _ = control.lqr(A, B, Q, R)
 x = -1 * np.array([[0.1], [0], [3], [0]])
 print(np.matmul(K, x))
 
-import sys
-sys.exit()
-
-log = False
+log = True
 
 time_steps = 40_000
 p = 136
@@ -62,7 +59,9 @@ for _ in range(time_steps):
     target_angle = (pos_p * pos) + (pos_d * pos_speed)
     p_error = angle - target_angle
     d_error = angle_speed
-    force = (p_error * p) + (d_error * d)
+    state = np.array([[angle], [angle_speed], [pos], [pos_speed]])
+    # force = (p_error * p) + (d_error * d)
+    force = np.matmul(K, (state * -1))[0, 0]
     angle_accel = get_angle_accel(angle, angle_speed, force)
     pos_accel = get_pos_accel(angle, angle_speed, angle_accel, force)
     angle += angle_speed * time_step
