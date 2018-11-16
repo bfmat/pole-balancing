@@ -32,9 +32,9 @@ def get_pos_accel(angle, angle_speed, angle_accel, force):
 
 
 # State space control matrices (linearized)
-A = np.array([[1, 1, 0, 0], [gravity * pole_length, 1, 0, 0], [0, 0, 1, 1], [0, 0, 0, 1]])
+A = np.array([[1, 1, 0, 0], [gravity / pole_length, 1, 0, 0], [0, 0, 1, 1], [0, 0, 0, 1]])
 B = np.array([[0], [-1], [0], [1]])
-Q = 0.001 * np.diag([1 / (0.03 ** 2), 1 / (0.01 ** 2), 1 / (20 ** 2), 1 / (1 ** 2)])
+Q = 0.001 * np.diag([1 / (0.1 ** 2), 1 / (0.1 ** 2), 1 / (20 ** 2), 1 / (1 ** 2)])
 R = np.array([[1 / (5 ** 2)]])
 # Calculate LQR optimal control policy
 K, _, _ = control.lqr(A, B, Q, R)
