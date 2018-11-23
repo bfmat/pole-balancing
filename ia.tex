@@ -37,6 +37,10 @@ One of the most famous problems in control theory is the \textit{pole balancing 
     \caption{\label{cartpole} A diagram of the pole balancing problem.}
 \end{figure}
 
-This problem is quite clearly not trivial. If the pole starts to fall to the right, one must accelerate the cart to the right to prevent it from falling over. However, that also results in the cart moving away from the center.
+This problem is quite clearly not trivial. If the pole starts to fall to the right, one must accelerate the cart to the right to prevent it from falling over. However, that also results in the cart moving away from the center. Thus, to successfully optimize both the angle and the position, one must gradually adjust the angle by applying small forces while the cart moves.
+
+\subsection{Control Algorithms}
+
+The most common classical solution to this kind of problem is the PID (proportional, integral, and derivative) closed control loop.
 
 \end{document}
