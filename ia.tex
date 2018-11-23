@@ -14,7 +14,7 @@
 
 \begin{document}
 
-\title{Applying State Space Control Theory to the Pole Balancing Problem}
+\title{Applying State Space Control and LQR to the Pole Balancing Problem}
 \author{Brendon Matusch}
 \date{November 2018}
 \maketitle
@@ -41,6 +41,14 @@ This problem is quite clearly not trivial. If the pole starts to fall to the rig
 
 \subsection{Control Algorithms}
 
-The most common classical solution to this kind of problem is the PID (proportional, integral, and derivative) closed control loop.
+The most common classical control solution to this kind of problem is the PID (proportional, integral, and derivative) closed control loop. While it is well-known that this can work, it is relatively difficult to optimize. PID loops are only able to optimize one variable at a time (for instance, the angle of the pole, or the position of the cart). Optimizing multiple variables (as is required here) necessitates nesting of PID loops, which frequently have to be optimized either manually or via machine learning.
+
+An alternative control method, which can optimize multiple variables with one or more inputs, is state space control. Rather than dealing with only a single variable, state space controllers can optimize an entire vector of states in a single linear function, making for a simpler and more elegant solution.
+
+For this project, I have created a mathematical simulation of the pole balancing problem and developed a state space controller to effectively optimize it.
+
+\subsection{Applications}
+
+A state space solution to the pole balancing problem has many applications outside of this environment. For instance, control of many kinds of robots (such as two-wheeled vehicles and walking humanoid robots) is related to the pole balancing problem. I have learned a great deal along the way about how state space control algorithms can generalize onto real-world control problems.
 
 \end{document}
