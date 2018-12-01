@@ -3,14 +3,15 @@
 \usepackage[margin=1in]{geometry}
 \usepackage{parskip}
 \usepackage{amsmath}
-\usepackage[backend=biber, style=alphabetic, sorting=ynt]{biblatex}
+\usepackage[style=ieee]{biblatex}
 \usepackage{graphicx}
 \usepackage{wrapfig}
 \usepackage{float}
 \usepackage{caption}
-\usepackage{hyperref}
 
 \graphicspath{{./images/}}
+
+\addbibresource{ia.bib}
 
 \begin{document}
 
@@ -24,20 +25,23 @@
 \subsection{The Pole Balancing Problem}
 
 One of the most famous problems in control theory is the \textit{pole balancing problem}, also known as \textit{cart pole}. The basic idea of the problem is as follows:
+
 \begin{itemize}
-    \item A movable cart sits on a straight, finite-length track.
-    \item A pole (light, relative to the cart) is anchored to the cart with a hinge.
-    \item A motor is attached to the cart; it can accelerate the cart to the left or right.
-    \item The goal is to prevent the pole from falling over, while also keeping the cart near the center of the track.
+    \item A movable cart with mass $M$ sits on a two-dimensional, straight track, at horizontal position $x$.
+    \item A pole with length $l$ is anchored to the cart with a hinge at angle $\theta$ (which can change).
+    \item A weight with mass $m$ is attached to the end of the pole.
+    \item A motor can accelerate the cart to the left or right with force $F$.
+    \item Gravity, which applies downward force $g$, is present.
+    \item The goal is to prevent the pole from falling over (to prevent $\theta$ from becoming too large), while also keeping the cart near the center of the track (keeping $x$ small).
 \end{itemize}
 
-\begin{figure}[h]
+\begin{figure}[ht]
     \centering
-    \includegraphics[width=180pt]{cartpole}
+    \includegraphics[width=0.5\textwidth]{cartpole}
     \caption{\label{cartpole} A diagram of the pole balancing problem.}
 \end{figure}
 
-This problem is quite clearly not trivial. If the pole starts to fall to the right, one must accelerate the cart to the right to prevent it from falling over. However, that also results in the cart moving away from the center. Thus, to successfully optimize both the angle and the position, one must gradually adjust the angle by applying small forces while the cart moves.
+This problem, as visualized in Figure \ref{cartpole}, is quite clearly not trivial. If the pole starts to fall to the right, one must accelerate the cart to the right to prevent it from falling over. However, that also results in the cart moving away from the center. Thus, to successfully optimize both the angle and the position, one must gradually adjust the angle by applying small forces while the cart moves.
 
 \subsection{Control Algorithms}
 
@@ -50,5 +54,36 @@ For this project, I have created a mathematical simulation of the pole balancing
 \subsection{Applications}
 
 A state space solution to the pole balancing problem has many applications outside of this environment. For instance, control of many kinds of robots (such as two-wheeled vehicles and walking humanoid robots) is related to the pole balancing problem. I have learned a great deal along the way about how state space control algorithms can generalize onto real-world control problems.
+
+\section{Environment}
+
+\subsection{Equations of Motion}
+
+In order to develop a solution to the pole-balancing problem, I first had to model it. Creating a physical cart pole setup would have taken a long time, so I used a simulated model instead. In order to develop this, I used the differential equations of motion for the pole balancing problem, which I found at \cite{polebalancing}:
+
+\begin{equation}
+    \ddot \theta = \frac{\displaystyle g \sin \theta + \cos \theta \left( \frac{\displaystyle -F - m l \dot \theta ^2 \sin \theta}{\displaystyle M + m} \right)}{\displaystyle l \left( \frac{\displaystyle 4}{\displaystyle 3} - \frac{\displaystyle m \cos ^2 \theta}{\displaystyle M + m} \right)}
+\end{equation}
+
+\begin{equation}
+    \ddot x = \frac{\displaystyle F + m l \left( \dot \theta ^2 \sin \theta - \ddot \theta \cos \theta \right)}{\displaystyle M + m}
+\end{equation}
+
+Note the use of dot-derivative notation, where $\displaystyle \dot \theta = \frac{\displaystyle d \theta}{\displaystyle d t}$ and $\displaystyle \ddot \theta = \frac{\displaystyle d ^2 \theta}{\displaystyle d t ^2}$ (and respectively for $x$).
+
+\subsection{Implementation}
+
+I implemented these equations of motion in Python 3 using \texttt{numpy}. The following constants were used:
+
+\begin{itemize}
+    \item $M = 1$
+    \item $m = 0.1$
+    \item $l = 0.5$
+    \item $g = 9.81$
+\end{itemize}
+
+The differential equations of motion refer to a continuous environment, where acceleration, position, and velocity values change every instant. Since this is impossible to compute in reality, I implemented the system with a time step of 0.001 (meaning that all variables of motion are updated every 0.001 time units).
+
+\printbibliography
 
 \end{document}
