@@ -73,7 +73,7 @@ Note the use of dot-derivative notation, where $\displaystyle \dot \theta = \fra
 
 \subsection{Implementation}
 
-I implemented these equations of motion in Python 3 using \texttt{numpy}. The following constants were used:
+I implemented these equations of motion in Python 3 using NumPy \cite{numpy}. The following constants were used:
 
 \begin{itemize}
     \item $M = 1$
@@ -83,6 +83,22 @@ I implemented these equations of motion in Python 3 using \texttt{numpy}. The fo
 \end{itemize}
 
 The differential equations of motion refer to a continuous environment, where acceleration, position, and velocity values change every instant. Since this is impossible to compute in reality, I implemented the system with a time step of 0.001 (meaning that all variables of motion are updated every 0.001 time units).
+
+\subsection{Visualization}
+
+\subsubsection{Graphical Front-End}
+
+To make the model more easy to visualize and understand, I developed a graphical front-end using PyQt5. It displays the cart and pole as rectangles on top of the linear track. It can be seen in Figure \ref{simulation}.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=\textwidth]{simulation}
+    \caption{\label{simulation} A screenshot of the graphical front-end.}
+\end{figure}
+
+\subsubsection{Motion Plots}
+
+For more precise static visualization of overshooting and other potential problems with control algorithms, I used Matplotlib \cite{matplotlib} to create plots over time of $x$, $\theta$, and $F$. These plots are seen throughout the rest of this paper.
 
 \printbibliography
 
