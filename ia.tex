@@ -32,7 +32,7 @@ One of the most famous problems in control theory is the \textit{pole balancing 
     \item A weight with mass $m$ is attached to the end of the pole.
     \item A motor can accelerate the cart to the left or right with force $F$.
     \item Gravity, which applies downward force $g$, is present.
-    \item The goal is to prevent the pole from falling over (to prevent $\theta$ from becoming too large), while also keeping the cart near the center of the track (keeping $x$ small).
+    \item The goal is to prevent the pole from falling over (to prevent $\theta$ from becoming too large), while also keeping the cart near the center of the track (keeping $x _c$ small).
 \end{itemize}
 
 \begin{figure}[ht]
@@ -57,7 +57,7 @@ A state space solution to the pole balancing problem has many applications outsi
 
 \section{Environment}
 
-\subsection{Equations of Motion}
+\subsection{Equations of Motion} \label{equations}
 
 In order to develop a solution to the pole-balancing problem, I first had to model it. Creating a physical cart pole setup would have taken a long time, so I used a simulated model instead. In order to develop this, I used the differential equations of motion for the pole balancing problem, which I found at \cite{polebalancing}:
 
@@ -66,10 +66,10 @@ In order to develop a solution to the pole-balancing problem, I first had to mod
 \end{equation}
 
 \begin{equation}
-    \ddot x = \frac{\displaystyle F + m l \left( \dot \theta ^2 \sin \theta - \ddot \theta \cos \theta \right)}{\displaystyle M + m}
+    \ddot x _c = \frac{\displaystyle F + m l \left( \dot \theta ^2 \sin \theta - \ddot \theta \cos \theta \right)}{\displaystyle M + m}
 \end{equation}
 
-Note the use of dot-derivative notation, where $\displaystyle \dot \theta = \frac{\displaystyle d \theta}{\displaystyle d t}$ and $\displaystyle \ddot \theta = \frac{\displaystyle d ^2 \theta}{\displaystyle d t ^2}$ (and respectively for $x$).
+Note the use of dot-derivative notation, where $\displaystyle \dot \theta = \frac{\displaystyle d \theta}{\displaystyle d t}$ and $\displaystyle \ddot \theta = \frac{\displaystyle d ^2 \theta}{\displaystyle d t ^2}$ (and respectively for $x _c$).
 
 \subsection{Implementation}
 
@@ -88,7 +88,7 @@ The differential equations of motion refer to a continuous environment, where ac
 
 \subsubsection{Graphical Front-End}
 
-To make the model more easy to visualize and understand, I developed a graphical front-end using PyQt5. It displays the cart and pole as rectangles on top of the linear track. It can be seen in Figure \ref{simulation}.
+To make the model more easy to visualize and understand, I developed a graphical front-end using PyQt5 (Figure \ref{simulation}). It displays the cart and pole as rectangles on top of the linear track.
 
 \begin{figure}[ht]
     \centering
@@ -98,7 +98,145 @@ To make the model more easy to visualize and understand, I developed a graphical
 
 \subsubsection{Motion Plots}
 
-For more precise static visualization of overshooting and other potential problems with control algorithms, I used Matplotlib \cite{matplotlib} to create plots over time of $x$, $\theta$, and $F$. These plots are seen throughout the rest of this paper.
+For more precise static visualization of overshooting and other potential problems with control algorithms, I used Matplotlib \cite{matplotlib} to create plots over time of $x _c$, $\theta$, and $F$. These plots are seen throughout the rest of this paper.
+
+\section{Control}
+
+\subsection{State Space Concepts}
+
+I learned about state space control from a book \cite{veness} written by Tyler Veness, a FIRST Robotics Competition mentor. I used the knowledge I gained in this book to develop a state space control algorithm that works for the pole balancing problem. The basic concepts of state space control are as follows:
+
+\begin{enumerate}
+    \item States of the environment to be controlled are expressed in a constantly changing state vector $x$ (not to be confused with the horizontal position $x _c$).
+    \item Inputs to the system are provided as an input vector $u$.
+    \item The derivative of the state vector, $\dot x$, is defined by the following equation:
+        \begin{equation}
+            \dot x = A x + B u
+        \end{equation}
+        The two matrices used in this equation represent a linear model of the environment as follows:
+        \begin{itemize}
+            \item The system matrix $A$ with size (states $\times$ states) defines how the states automatically change over time (in dynamics such as gravity).
+            \item The input matrix $B$ with size (states $\times$ inputs) defines how the inputs provided by a control algorithm influence the changing states of the environment.
+        \end{itemize}
+    \item The basic control law of state space is as follows:
+        \begin{equation}
+            u = K(r - x)
+        \end{equation}
+        The \textit{reference} vector, which contains the values we hope to drive the states to, is written as $r$. If the goal is to minimize the states, it will be a vector of zeroes. $K$ is the \textit{controller gain} matrix, of size (inputs $\times$ states). It is multiplied by the state error $r - x$ to produce a (hopefully) optimal input to drive the states to the reference.
+\end{enumerate}
+
+\subsection{State Space Implementation}
+
+\subsubsection{States and Inputs}
+
+The first step in developing a state space control algorithm was to express the environment in state space notation. This means choosing a vector of states and a vector of inputs that fully define the cart pole system.
+
+The physical dynamics can be fully described with only four parameters: $\theta$, $\dot \theta$, $x _c$, and $\dot x _c$. These are the only non-constant parameters used in the differential equations of motion in Section \ref{equations}. Thus:
+
+\begin{equation}
+    \displaystyle x = \begin{bmatrix}
+        \theta \\
+        \dot \theta \\
+        x _c \\
+        \dot x _c
+    \end{bmatrix}
+\end{equation}
+
+While there are four states required to describe the environment, there is only one parameter the controller has access to, and that is the force applied to the cart. Thus:
+
+\begin{equation}
+    u = \begin{bmatrix}
+        F
+    \end{bmatrix}
+\end{equation}
+
+\subsubsection{Linearization}
+
+Since the full behavior of the environment is described in two constant matrices ($A$ and $B$), and matrix multiplication is a linear operation, the environment must actually be linearized to use standard state space control. I took advantage of the following facts to linearize the pole balancing problem:
+
+\begin{itemize}
+    \item The torque applied by gravity on the arm is equal to $\displaystyle \frac{\displaystyle g \sin \theta}{\displaystyle l}$, which can be linearly approximated as $\displaystyle \frac{\displaystyle g \theta}{\displaystyle l}$ for values of $\theta$ near 0.
+    \item The torque applied by horizontal acceleration of the cart on the arm (assuming the arm is of negligible mass) is equal to $\displaystyle - \frac{\displaystyle F \cos \theta}{\displaystyle l}$, which can be linearly approximated as $\displaystyle - \frac{\displaystyle F}{\displaystyle l}$ for values of $\theta$ near 0.
+    \item The acceleration applied to the cart by a force is simply equal to $\displaystyle \frac{\displaystyle F}{\displaystyle M + m}$ (once again, under the assumption that the pole mass is negligible).
+    \item The only dynamics other than gravity and force that must be modeled are the influences of the velocity states $\dot \theta$ and $\dot x _c$ on $\theta$ and $x _c$, respectively. These are obviously linear.
+\end{itemize}
+
+Thus, we have the following five linearized equations of motion, which define the changing state over one unit of time:
+
+\begin{equation}
+    \displaystyle \theta := \theta + \dot \theta
+\end{equation}
+
+\begin{equation}
+    \displaystyle \dot \theta := \dot \theta - \frac{\displaystyle F \cos \theta + g \theta}{\displaystyle l}
+\end{equation}
+
+\begin{equation}
+    \displaystyle x _c := x _c + \dot x _c
+\end{equation}
+
+\begin{equation}
+    \dot x _c := \displaystyle \dot x _c + \frac{\displaystyle F}{\displaystyle M + m}
+\end{equation}
+
+These linear equations very nicely map onto the following linear algebra equation (once again, over one time step):
+
+\begin{equation}
+    \displaystyle
+    \begin{bmatrix}
+        \theta \\
+        \dot \theta \\
+        x _c \\
+        \dot x _c
+    \end{bmatrix}
+    := \begin{bmatrix}
+        \theta \\
+        \dot \theta \\
+        x _c \\
+        \dot x _c
+    \end{bmatrix}
+    + \begin{bmatrix}
+        0 & 1 & 0 & 0 \\
+        \frac{g}{l} & 0 & 0 & 0 \\
+        0 & 0 & 0 & 1 \\
+        0 & 0 & 0 & 0
+    \end{bmatrix}
+    \begin{bmatrix}
+        \theta \\
+        \dot \theta \\
+        x _c \\
+        \dot x _c
+    \end{bmatrix}
+    + \begin{bmatrix}
+        0 \\
+        - \frac{1}{l} \\
+        0 \\
+        \frac{1}{M + m}
+    \end{bmatrix}
+    \begin{bmatrix}
+        F
+    \end{bmatrix}
+\end{equation}
+
+Thus, we have our values for $A$ and $B$:
+
+\begin{equation}
+    \displaystyle A = \begin{bmatrix}
+        0 & 1 & 0 & 0 \\
+        \frac{g}{l} & 0 & 0 & 0 \\
+        0 & 0 & 0 & 1 \\
+        0 & 0 & 0 & 0
+    \end{bmatrix}
+\end{equation}
+
+\begin{equation}
+    \displaystyle B = \begin{bmatrix}
+        0 \\
+        - \frac{1}{l} \\
+        0 \\
+        \frac{1}{M + m}
+    \end{bmatrix}
+\end{equation}
 
 \printbibliography
 
