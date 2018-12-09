@@ -260,6 +260,16 @@ The reference vector $r$ is easy to find: in the pole balancing problem, one usu
     \end{bmatrix}
 \end{equation}
 
+\subsection{Controller Gain Matrix}
+
+\subsubsection{Concept}
+
+Finding the controller gain matrix $K$ is clearly the most difficult part of developing a state space controller. In Equation \ref{control_law}, we can see that it is a matrix mapping the error of the current states off the reference to the input $u$. More intuitively, it can be thought of as a linear regression of the states, used to calculate the best possible input.
+
+\subsubsection{Linear-Quadratic Regulator}
+
+Rather than being trained as in a typical linear regression, an optimal value for $K$ can be found using a control law called Linear-Quadratic Regulator (LQR). Like a linear regression, LQR optimizes a cost function. However, rather than requiring training data extracted from a model of the environment, LQR can optimize $K$ using only the state-space model matrices $A$ and $B$, alongside two cost matrices defined by the developer.
+
 \printbibliography
 
 \end{document}
