@@ -146,7 +146,7 @@ While there are four states required to describe the environment, there is only 
 
 \begin{equation}
     u = \begin{bmatrix}
-        F
+        \displaystyle F
     \end{bmatrix}
 \end{equation}
 
@@ -276,15 +276,28 @@ The cost function optimized is as follows:
     J = \int _0 ^{\infty} \! (x ^T Q x + u ^T R u) \, dt
 \end{equation}
 
-$Q$ are diagonal matrices that define the costs of large errors for each of the states respectively. $R$ defines the cost of large values for each of the inputs. After some empirical optimization, I settled on the following values for Q and R:
+$Q$ are diagonal matrices that define the costs of large errors for each of the states respectively. $R$ defines the cost of large values for each of the inputs. After using Bryson's rule \cite{veness}, and some empirical optimization, I settled on the following values for Q and R:
 
 \begin{equation}
-    Q = 40 \cdot \begin{bmatrix}
-        - \frac{1}{l} & 0 & 0 & 0 \\
-        0 \\
-        0 \\
-        0
+    Q = 40 \begin{bmatrix}
+        1 & 0 & 0 & 0 \\
+        0 & \frac{1}{9} & 0 & 0 \\
+        0 & 0 & \frac{1}{100} & 0 \\
+        0 & 0 & 0 & \frac{1}{400}
     \end{bmatrix}
+\end{equation}
+
+\begin{equation}
+    R = \begin{bmatrix}
+        \displaystyle
+        \frac{1}{100}
+    \end{bmatrix}
+\end{equation}
+
+Given values for $Q$ and $R$, the optimal controller gain matrix $K$ was calculated using the following formula (implemented in the Python Control library):
+
+\begin{equation}
+    j
 \end{equation}
 
 \printbibliography
