@@ -270,6 +270,23 @@ Finding the controller gain matrix $K$ is clearly the most difficult part of dev
 
 Rather than being trained as in a typical linear regression, an optimal value for $K$ can be found using a control law called Linear-Quadratic Regulator (LQR). Like a linear regression, LQR optimizes a cost function. However, rather than requiring training data extracted from a model of the environment, LQR can optimize $K$ using only the state-space model matrices $A$ and $B$, alongside two cost matrices defined by the developer.
 
+The cost function optimized is as follows:
+
+\begin{equation}
+    J = \int _0 ^{\infty} \! (x ^T Q x + u ^T R u) \, dt
+\end{equation}
+
+$Q$ are diagonal matrices that define the costs of large errors for each of the states respectively. $R$ defines the cost of large values for each of the inputs. After some empirical optimization, I settled on the following values for Q and R:
+
+\begin{equation}
+    Q = 40 \cdot \begin{bmatrix}
+        - \frac{1}{l} & 0 & 0 & 0 \\
+        0 \\
+        0 \\
+        0
+    \end{bmatrix}
+\end{equation}
+
 \printbibliography
 
 \end{document}
