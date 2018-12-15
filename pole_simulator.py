@@ -45,10 +45,10 @@ K, _, _ = control.lqr(A, B, Q, R)
 
 # Switches for output modes
 log = False
-graph = False
+graph = True
 gui = False
 
-time_steps = int(10.1 / time_step)
+time_steps = int(10 / time_step)
 angle = 0
 angle_speed = 0
 pos = -8
@@ -60,7 +60,7 @@ angles = []
 forces = []
 times = []
 
-for i in range(time_steps):
+for _ in range(time_steps):
     state = np.array([[angle], [angle_speed], [pos], [pos_speed]])
     force = np.matmul(K, (state * -1))[0, 0]
     angle_accel = get_angle_accel(angle, angle_speed, force)
@@ -75,15 +75,6 @@ for i in range(time_steps):
     angles.append(angle)
     forces.append(force)
     times.append(time)
-
-    if i in [0, 1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000]:
-        print('Time:', time)
-        print('Position:', pos)
-        print('Angle:', angle)
-        print('Force:', force)
-        print()
-        print()
-        print()
 
     if log:
         print('Time:', time)
