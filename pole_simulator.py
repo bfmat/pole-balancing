@@ -45,8 +45,8 @@ K, _, _ = control.lqr(A, B, Q, R)
 
 # Switches for output modes
 log = False
-graph = False
-gui = True
+graph = True
+gui = False
 
 time_steps = int(20 / time_step)
 angle = 0
@@ -95,14 +95,20 @@ if graph:
     plt.subplot(3, 1, 1)
     plt.plot(times, positions)
     plt.title('Position')
+    plt.xlabel('Time (s)')
+    plt.ylabel('Position (m)')
 
     plt.subplot(3, 1, 2)
     plt.plot(times, angles)
     plt.title('Angle')
+    plt.xlabel('Time (s)')
+    plt.ylabel('Angle (rad)')
 
     plt.subplot(3, 1, 3)
     plt.plot(times, forces)
     plt.title('Force Applied')
+    plt.xlabel('Time (s)')
+    plt.ylabel('Force Applied (m/s$^2$)')
 
     plt.show()
 
