@@ -48,7 +48,7 @@ log = False
 graph = True
 gui = False
 
-time_steps = int(20 / time_step)
+time_steps = int(10 / time_step)
 angle = 0
 angle_speed = 0
 pos = -8
@@ -92,24 +92,22 @@ for _ in range(time_steps):
         break
 
 if graph:
-    plt.subplot(3, 1, 1)
     plt.plot(times, positions)
     plt.title('Position')
     plt.xlabel('Time (s)')
     plt.ylabel('Position (m)')
+    plt.show()
 
-    plt.subplot(3, 1, 2)
     plt.plot(times, angles)
     plt.title('Angle')
     plt.xlabel('Time (s)')
     plt.ylabel('Angle (rad)')
+    plt.show()
 
-    plt.subplot(3, 1, 3)
     plt.plot(times, forces)
     plt.title('Force Applied')
     plt.xlabel('Time (s)')
     plt.ylabel('Force Applied (m/s$^2$)')
-
     plt.show()
 
 

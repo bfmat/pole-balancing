@@ -296,6 +296,28 @@ $Q$ are diagonal matrices that define the costs of large errors for each of the 
 
 Given values for $Q$ and $R$, the optimal controller gain matrix $K$ was calculated using the Python Control library.
 
+\section{Results}
+
+After implementation, testing, and empirical tweaking of the cost matrices $Q$ and $R$, I found that the resulting controller gain matrix $K$ was a very nearly optimal solution to the environment, bringing the pole to the center of the track very rapidly and with very minimal overshoot. Figures \ref{position}, \ref{angle}, and \ref{force} display this graphically.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.8\textwidth]{position}
+    \caption{\label{position} A graphical representation of changes in $x _c$ over time.}
+\end{figure}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.8\textwidth]{angle}
+    \caption{\label{angle} A graphical representation of changes in $\theta$ over time.}
+\end{figure}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.8\textwidth]{force}
+    \caption{\label{force} A graphical representation of changes in $F$ over time.}
+\end{figure}
+
 \printbibliography
 
 \end{document}
