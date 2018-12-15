@@ -298,7 +298,34 @@ Given values for $Q$ and $R$, the optimal controller gain matrix $K$ was calcula
 
 \section{Results}
 
-After implementation, testing, and empirical tweaking of the cost matrices $Q$ and $R$, I found that the resulting controller gain matrix $K$ was a very nearly optimal solution to the environment, bringing the pole to the center of the track very rapidly and with very minimal overshoot. Figures \ref{position}, \ref{angle}, and \ref{force} display this graphically.
+After implementation, testing, and empirical tweaking of the cost matrices $Q$ and $R$, I found that the resulting controller gain matrix $K$ was a very nearly optimal solution to the environment, bringing the pole to the center of the track very rapidly and with very minimal overshoot.
+
+Figures \ref{position}, \ref{angle}, and \ref{force} display this graphically. Raw numbers can be found in Table \ref{motion_statistics}. The beginning conditions were: $x _c = -8$ (quite close to the track boundary, which is at -10) and $\theta = 0$.
+
+\begin{center}
+    \begin{tabular}{|l|l|l|l|}
+        \hline
+        Time (s) & $x _c$ & $\theta$ & $F$ \\
+        \hline
+        0.00 & -8.00 & 0.00 & -50.60 \\
+        \hline
+        1.00 & -6.62 & 0.16 & 1.54 \\
+        \hline
+        2.00 & -3.32 & -0.12 & -1.52 \\
+        \hline
+        3.00 & -1.14 & -0.13 & -1.40 \\
+        \hline
+        4.00 & -0.20 & -0.07 & -0.72 \\
+        \hline
+        6.00 & 0.09 & -0.01 & -0.05 \\
+        \hline
+        8.00 & 0.02 & 0.00 & 0.02 \\
+        \hline
+        10.00 & 0.00 & 0.00 & 0.00 \\
+        \hline
+    \end{tabular}
+    \captionof{table}{Raw statistics of changing variables over time.} \label{motion_statistics}
+\end{center}
 
 \begin{figure}[ht]
     \centering
