@@ -51,7 +51,7 @@ An alternative control method, which can optimize multiple variables with one or
 
 For this project, I have created a mathematical simulation of the pole balancing problem and developed a state space controller to effectively optimize it. While this was a challenging endeavor and I had to learn a lot of new mathematics, I am very happy with the result.
 
-\subsection{Applications}
+\subsection{Applications} \label{applications}
 
 A state space solution to the pole balancing problem has many applications outside of this environment. For instance, control of many kinds of robots (such as two-wheeled vehicles and walking humanoid robots) is related to the pole balancing problem. I have learned a great deal along the way about how state space control algorithms can generalize onto real-world control problems.
 
@@ -112,7 +112,7 @@ I learned about state space control from a book \cite{veness} written by Tyler V
     \item States of the environment to be controlled are expressed in a constantly changing state vector $x$ (not to be confused with the horizontal position $x _c$).
     \item Inputs to the system are provided as an input vector $u$.
     \item The derivative of the state vector, $\dot x$, is defined by the following equation:
-        \begin{equation}
+        \begin{equation} \label{state_derivative}
             \dot x = A x + B u
         \end{equation}
         The two matrices used in this equation represent a linear model of the environment as follows:
@@ -300,7 +300,20 @@ Given values for $Q$ and $R$, the optimal controller gain matrix $K$ was calcula
 
 \section{Results}
 
-After implementation, testing, and empirical tweaking of the cost matrices $Q$ and $R$, I found that the resulting controller gain matrix $K$ was a very nearly optimal solution to the environment, bringing the pole to the center of the track very rapidly and with very minimal overshoot. Indeed, within 10 seconds all variables have settled to values within a rounding error of zero.
+\subsection{Trial and Error}
+
+The first time I implemented this system, I made two fundamental mistakes:
+
+\begin{itemize}
+    \item I thought that Equation \ref{state_derivative} yielded $x$ itself rather than $\dot x$, so I added the identity matrix to $A$.
+    \item I made the incorrect assumption, in my environment matrices, that $l$ was equal to 1.
+\end{itemize}
+
+Despite these errors, the controller still made all states converge to zero, which says something very significant about the robustness of closed-loop control systems. However, it was slow to approach zero. When I fixed these errors, the stability of the system and the rate of convergence drastically improved.
+
+\subsection{Results (Actually)}
+
+After these issues were fixed, and after some empirical tweaking of the cost matrices $Q$ and $R$, I found that the resulting controller gain matrix $K$ was a very nearly optimal solution to the environment, bringing the pole to the center of the track very rapidly and with very minimal overshoot. Indeed, within 10 seconds all variables have settled to values within a rounding error of zero.
 
 Figures \ref{position}, \ref{angle}, and \ref{force} display this graphically. Raw numbers can be found in Table \ref{motion_statistics}. The beginning conditions were: $x _c = -8$ (quite close to the track boundary, which is at -10) and $\theta = 0$.
 
@@ -326,7 +339,7 @@ Figures \ref{position}, \ref{angle}, and \ref{force} display this graphically. R
         10.00 & 0.00 & 0.00 & 0.00 \\
         \hline
     \end{tabular}
-    \captionof{table}{Raw statistics of changing variables over time.} \label{motion_statistics}
+    \captionof{table}{Raw statistics of changes in variables over time.} \label{motion_statistics}
 \end{center}
 
 \begin{figure}[H]
@@ -346,6 +359,16 @@ Figures \ref{position}, \ref{angle}, and \ref{force} display this graphically. R
     \includegraphics[width=0.8\textwidth]{force}
     \caption{\label{force} A graphical representation of changes in $F$ over time.}
 \end{figure}
+
+\section{Conclusions}
+
+These results confirm and demonstrate that linear state space control can indeed make for a robust solution to nonlinear physical environments such as the pole balancing problem. After expressing the environment as a set of linear matrices and applying the LQR optimizer, I have developed a controller that drives all states to the reference efficiently and with very minimal overshoot.
+
+The main implications of these results lie in how they can be expected to generalize to other nonlinear control tasks. As mentioned in Section \ref{applications}, the pole balancing problem has a great deal in common with problems such as bicycle control and humanoid robots, so this result may suggest that state space and LQR have applicability to those challenges.
+
+State space is also used for other diverse subfields of physical control. For instance, the Ramsete controller \cite{ramsete}, which was used by FRC Team 254 for control of four-wheeled non-holonomic robots, is based on state space with modifications for nonlinear path following.
+
+In the future, I hope to investigate other applications for state space and LQR, such as autonomous vehicles. I also hope to learn more about nonlinear control algorithms, and understand where they can, and should, be used instead of linear control.
 
 \printbibliography
 
