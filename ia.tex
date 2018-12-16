@@ -84,6 +84,8 @@ I implemented these equations of motion in Python 3 using NumPy \cite{numpy}. Th
 
 The differential equations of motion refer to a continuous environment, where acceleration, position, and velocity values change every instant. Since this is impossible to compute in reality, I implemented the system with a time step of 0.001 (meaning that all variables of motion are updated every 0.001 time units).
 
+While all equations work with arbitrary units, in this paper all variables and quantities are assumed to be in SI units (seconds, meters, kilograms, and radians).
+
 \subsection{Visualization}
 
 \subsubsection{Graphical Front-End}
@@ -298,7 +300,7 @@ Given values for $Q$ and $R$, the optimal controller gain matrix $K$ was calcula
 
 \section{Results}
 
-After implementation, testing, and empirical tweaking of the cost matrices $Q$ and $R$, I found that the resulting controller gain matrix $K$ was a very nearly optimal solution to the environment, bringing the pole to the center of the track very rapidly and with very minimal overshoot.
+After implementation, testing, and empirical tweaking of the cost matrices $Q$ and $R$, I found that the resulting controller gain matrix $K$ was a very nearly optimal solution to the environment, bringing the pole to the center of the track very rapidly and with very minimal overshoot. Indeed, within 10 seconds all variables have settled to values within a rounding error of zero.
 
 Figures \ref{position}, \ref{angle}, and \ref{force} display this graphically. Raw numbers can be found in Table \ref{motion_statistics}. The beginning conditions were: $x _c = -8$ (quite close to the track boundary, which is at -10) and $\theta = 0$.
 
@@ -327,19 +329,19 @@ Figures \ref{position}, \ref{angle}, and \ref{force} display this graphically. R
     \captionof{table}{Raw statistics of changing variables over time.} \label{motion_statistics}
 \end{center}
 
-\begin{figure}[ht]
+\begin{figure}[H]
     \centering
     \includegraphics[width=0.8\textwidth]{position}
     \caption{\label{position} A graphical representation of changes in $x _c$ over time.}
 \end{figure}
 
-\begin{figure}[ht]
+\begin{figure}[H]
     \centering
     \includegraphics[width=0.8\textwidth]{angle}
     \caption{\label{angle} A graphical representation of changes in $\theta$ over time.}
 \end{figure}
 
-\begin{figure}[ht]
+\begin{figure}[H]
     \centering
     \includegraphics[width=0.8\textwidth]{force}
     \caption{\label{force} A graphical representation of changes in $F$ over time.}
