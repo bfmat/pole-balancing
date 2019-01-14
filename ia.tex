@@ -22,7 +22,7 @@
 
 \section{Introduction}
 
-\subsection{The Pole Balancing Problem}
+\subsection{The Pole Balancing Problem} \label{problem}
 
 One of the most famous problems in control theory is the \textit{pole balancing problem}, also known as \textit{cart pole}. The basic idea of the problem is as follows:
 
@@ -41,19 +41,19 @@ One of the most famous problems in control theory is the \textit{pole balancing 
     \caption{\label{cartpole} A diagram of the pole balancing problem.}
 \end{figure}
 
-This problem, as visualized in Figure \ref{cartpole}, is quite clearly not trivial. If the pole starts to fall to the right, one must accelerate the cart to the right to prevent it from falling over. However, that also results in the cart moving away from the center. Thus, to successfully optimize both the angle and the position, one must gradually adjust the angle by applying small forces while the cart moves.
+I hoped to solve the pole balancing problem in an efficient way, because a solution to this problem has many applications in a variety of fields. For instance, control of many kinds of robots (such as two-wheeled vehicles and walking humanoid robots) is closely related to the pole balancing problem. All the concepts I have learned throughout developing a solution to this problem are applicable to challenges in robotics, some of which I hope to approach in the future.
+
+The pole balancing problem, as visualized in Figure \ref{cartpole}, is quite clearly not trivial. If the pole starts to fall to the right, one must accelerate the cart to the right to prevent it from falling over. However, that also results in the cart moving away from the center. Thus, to successfully optimize both the angle and the position, one must gradually adjust the angle by applying small forces while the cart moves.
 
 \subsection{Control Algorithms}
 
-The most common classical control solution to this kind of problem is the PID (proportional, integral, and derivative) closed control loop. While it is well-known that this can work, it is relatively difficult to optimize. PID loops are only able to optimize one variable at a time (for instance, the angle of the pole, or the position of the cart). Optimizing multiple variables (as is required here) necessitates nesting of PID loops, which frequently have to be optimized either manually or via machine learning.
+I started by researching the most common control algorithms for this kind of control challenge. The most frequently used method I encountered, both in my past experience and in my research, was the PID (proportional, integral, and derivative) closed control loop. However, I discovered that PID loops are only able to optimize one variable at a time (for instance, the angle of the pole, or the position of the cart). Optimizing multiple variables (as is required here) necessitates nesting of PID loops, which frequently have to be optimized either manually or via machine learning.
 
-An alternative control method, which can optimize multiple variables with one or more inputs, is state space control. Rather than dealing with only a single variable, state space controllers can optimize an entire vector of states in a single linear function, making for a simpler and more elegant solution.
+An alternative control method I encountered in my research, which can optimize multiple variables with one or more inputs, is state space control. Rather than dealing with only a single variable, state space controllers can optimize an entire vector of states in a single linear function, making for a simpler and more elegant solution.
 
-For this project, I have created a mathematical simulation of the pole balancing problem and developed a state space controller to effectively optimize it. While this was a challenging endeavor and I had to learn a lot of new mathematics, I am very happy with the result.
+Additionally, and more importantly, I discovered that state space controllers can be automatically optimized using a method known as Linear-Quadratic Regulator (LQR). While I found it surprising that LQR is such an automatic method, further research confirmed my findings. All that is required is a linear model of the environment expressed in matrices.
 
-\subsection{Applications} \label{applications}
-
-A state space solution to the pole balancing problem has many applications outside of this environment. For instance, control of many kinds of robots (such as two-wheeled vehicles and walking humanoid robots) is related to the pole balancing problem. I have learned a great deal along the way about how state space control algorithms can generalize onto real-world control problems.
+For this project, I have created a mathematical model of the pole balancing problem and developed a state space controller to effectively optimize it. While this was a challenging endeavor and I had to learn a lot of new mathematics, I am very happy with the result.
 
 \section{Environment}
 
@@ -69,11 +69,15 @@ In order to develop a solution to the pole-balancing problem, I first had to mod
     \ddot x _c = \frac{\displaystyle F + m l \left( \dot \theta ^2 \sin \theta - \ddot \theta \cos \theta \right)}{\displaystyle M + m}
 \end{equation}
 
-Note the use of dot-derivative notation, where $\displaystyle \dot \theta = \frac{\displaystyle d \theta}{\displaystyle d t}$ and $\displaystyle \ddot \theta = \frac{\displaystyle d ^2 \theta}{\displaystyle d t ^2}$ (and respectively for $x _c$).
+Note the use of dot-derivative notation, where $\displaystyle \dot \theta = \frac{\displaystyle d \theta}{\displaystyle d t}$ (the first derivative of $\theta$) and $\displaystyle \ddot \theta = \frac{\displaystyle d ^2 \theta}{\displaystyle d t ^2}$ (the second derivative of $\theta$, and the first derivative of $\dot \theta$), and respectively for $x _c$.
+
+That is, $\dot \theta$ is the rate at which $\theta$ is changing in radians per second, and $\ddot \theta$ is the rate at which $\dot \theta$ is changing in radians per second squared.
 
 \subsection{Implementation}
 
-I implemented these equations of motion in Python 3 using NumPy \cite{numpy}. The following constants were used:
+Of course, it would not be possible to run such a simulation with many variables on a calculator, so I wrote a program instead. I implemented these equations of motion in Python 3 using NumPy \cite{numpy}, which is a commonly used library for basic linear algebra operations like matrix multiplications. I have used NumPy numerous times in the past for tasks such as machine learning, so I was quite familiar with it.
+
+The following values were used for the various constants of the system:
 
 \begin{itemize}
     \item $M = 1$
@@ -88,19 +92,24 @@ While all equations work with arbitrary units, in this paper all variables and q
 
 \subsection{Visualization}
 
-\subsubsection{Graphical Front-End}
+\subsubsection{Animated Visualization Tool}
 
-To make the model more easy to visualize and understand, I developed a graphical front-end using PyQt5 (Figure \ref{simulation}). It displays the cart and pole as rectangles on top of the linear track.
+To make the model more easy to visualize and understand, I developed an animated visualization tool using PyQt5 (Figure \ref{simulation}). It displays the cart and pole as rectangles on top of the linear track.
 
 \begin{figure}[ht]
     \centering
     \includegraphics[width=\textwidth]{simulation}
-    \caption{\label{simulation} A screenshot of the graphical front-end.}
+    \caption{\label{simulation} A screenshot of the animated visualization tool.}
 \end{figure}
 
 \subsubsection{Motion Plots}
 
-For more precise static visualization of overshooting and other potential problems with control algorithms, I used Matplotlib \cite{matplotlib} to create plots over time of $x _c$, $\theta$, and $F$. These plots are seen throughout the rest of this paper.
+For more precise static visualization of potential problems with control algorithms, I used Matplotlib \cite{matplotlib} to create plots over time of $x _c$, $\theta$, and $F$. These plots are seen in Figures \ref{position}, \ref{angle}, and \ref{force} at the end of this paper. Following are some specific issues this tool can help to shed light on:
+
+\begin{itemize}
+    \item Overshooting: when, rather than gradually settling to a stable equilibrium, the controller accelerates the cart and does not slow down enough to slow down and stop at 0. Mathematically, a controller that does not overshoot has a limit of 0 and is strictly increasing (if the starting $x _c$ is below 0) or strictly decreasing (if the starting $x _c$ is above 0).
+    \item Excessive acceleration: rapid jumps or spikes in any of the variables in question may indicate strange and unwanted behavior, which may be attributable to poor parameter choices or modeling errors.
+\end{itemize}
 
 \section{State Space}
 
@@ -120,6 +129,12 @@ I learned about state space control from a book \cite{veness} written by Tyler V
             \item The system matrix $A$ with size (states $\times$ states) defines how the states automatically change over time (in dynamics such as gravity).
             \item The input matrix $B$ with size (states $\times$ inputs) defines how the inputs provided by a control algorithm influence the changing states of the environment.
         \end{itemize}
+        Figure \ref{state_space} illustrates the flow of data as described by this equation.
+        \begin{figure}[ht]
+            \centering
+            \includegraphics[width=\textwidth]{state_space}
+            \caption{\label{state_space} A flow chart describing changes in a state space environment.}
+        \end{figure}
     \item The basic control law of state space is as follows:
         \begin{equation} \label{control_law}
             u = K(r - x)
@@ -364,7 +379,7 @@ Figures \ref{position}, \ref{angle}, and \ref{force} display this graphically. R
 
 These results confirm and demonstrate that linear state space control can indeed make for a robust solution to nonlinear physical environments such as the pole balancing problem. After expressing the environment as a set of linear matrices and applying the LQR optimizer, I have developed a controller that drives all states to the reference efficiently and with very minimal overshoot.
 
-The main implications of these results lie in how they can be expected to generalize to other nonlinear control tasks. As mentioned in Section \ref{applications}, the pole balancing problem has a great deal in common with problems such as bicycle control and humanoid robots, so this result may suggest that state space and LQR have applicability to those challenges.
+The main implications of these results lie in how they can be expected to generalize to other nonlinear control tasks. As mentioned in Section \ref{problem}, the pole balancing problem has a great deal in common with problems such as bicycle control and humanoid robots, so this result may suggest that state space and LQR have applicability to those challenges.
 
 State space is also used for other diverse subfields of physical control. For instance, the Ramsete controller \cite{ramsete}, which was used by FRC Team 254 for control of four-wheeled non-holonomic robots, is based on state space with modifications for nonlinear path following.
 
