@@ -27,7 +27,7 @@
 One of the most famous problems in control theory is the \textit{pole balancing problem}, also known as \textit{cart pole}. The basic idea of the problem is as follows:
 
 \begin{itemize}
-    \item A movable cart with mass $M$ sits on a two-dimensional, straight track, at horizontal position $x$.
+    \item A movable cart with mass $M$ sits on a two-dimensional, straight track, at horizontal position $x _c$.
     \item A pole with length $l$ is anchored to the cart with a hinge at angle $\theta$ (which can change).
     \item A weight with mass $m$ is attached to the end of the pole.
     \item A motor can accelerate the cart to the left or right with force $F$.
@@ -118,11 +118,11 @@ For more precise static visualization of potential problems with control algorit
 I learned about state space control from a book \cite{veness} written by Tyler Veness, a FIRST Robotics Competition mentor. I used the knowledge I gained in this book to develop a state space control algorithm that works for the pole balancing problem. The basic concepts of state space control are as follows:
 
 \begin{enumerate}
-    \item States of the environment to be controlled are expressed in a constantly changing state vector $x$ (not to be confused with the horizontal position $x _c$).
-    \item Inputs to the system are provided as an input vector $u$.
-    \item The derivative of the state vector, $\dot x$, is defined by the following equation:
+    \item States of the environment to be controlled are expressed in a constantly changing state vector $\vec{x}$ (not to be confused with the horizontal position $x _c$).
+    \item Inputs to the system are provided as an input vector $\vec{u}$.
+    \item The derivative of the state vector, $\dot{\vec{x}}$, is defined by the following equation:
         \begin{equation} \label{state_derivative}
-            \dot x = A x + B u
+            \dot{\vec{x}} = A x + B u
         \end{equation}
         The two matrices used in this equation represent a linear model of the environment as follows:
         \begin{itemize}
@@ -137,9 +137,9 @@ I learned about state space control from a book \cite{veness} written by Tyler V
         \end{figure}
     \item The basic control law of state space is as follows:
         \begin{equation} \label{control_law}
-            u = K(r - x)
+            \vec{u} = K(\vec{r} - \vec{x})
         \end{equation}
-        The \textit{reference} vector, which contains the values we hope to drive the states to, is written as $r$. If the goal is to minimize the states, it will be a vector of zeroes. $K$ is the \textit{controller gain} matrix, of size (inputs $\times$ states). It is multiplied by the state error $r - x$ to produce a (hopefully) optimal input to drive the states to the reference.
+        The \textit{reference} vector, which contains the values we hope to drive the states to, is written as $\vec{r}$. If the goal is to minimize the states, it will be a vector of zeroes. $K$ is the \textit{controller gain} matrix, of size (inputs $\times$ states). It is multiplied by the state error $\vec{r} - \vec{x}$ to produce a (hopefully) optimal input to drive the states to the reference.
 \end{enumerate}
 
 \subsection{Implementation}
@@ -148,10 +148,10 @@ I learned about state space control from a book \cite{veness} written by Tyler V
 
 The first step in developing a state space control algorithm was to express the environment in state space notation. This means choosing a vector of states and a vector of inputs that fully define the cart pole system.
 
-The physical dynamics can be fully described with only four parameters: $\theta$, $\dot \theta$, $x _c$, and $\dot x _c$. These are the only non-constant parameters used in the differential equations of motion in Section \ref{equations}. Thus:
+The physical dynamics can be fully described with only four parameters: $\theta$ (which determines the action of gravity), $\dot \theta$ (which defines the momentum of the pole), $x _c$ (the distance along the track), and $\dot x _c$ (the momentum of the cart). These are the only non-constant parameters used in the differential equations of motion in Section \ref{equations}. Thus:
 
 \begin{equation}
-    \displaystyle x = \begin{bmatrix}
+    \displaystyle \vec{x} = \begin{bmatrix}
         \theta \\
         \dot \theta \\
         x _c \\
@@ -162,7 +162,7 @@ The physical dynamics can be fully described with only four parameters: $\theta$
 While there are four states required to describe the environment, there is only one parameter the controller has access to, and that is the force applied to the cart. Thus:
 
 \begin{equation}
-    u = \begin{bmatrix}
+    \vec{u} = \begin{bmatrix}
         \displaystyle F
     \end{bmatrix}
 \end{equation}
@@ -261,15 +261,15 @@ Thus, we have our values for $A$ and $B$:
 
 \subsection{Objective}
 
-While the model of the environment is complete, we currently have no way to control it. To use the basic state space control law in Equation \ref{control_law}, we need the controller gain matrix $K$ and the reference $r$. Our objective is to find values of $K$ and $r$ such that the pole will remain in a stable, upright state, and reach it as quickly as possible with minimal error.
+While the model of the environment is complete, we currently have no way to control it. To use the basic state space control law in Equation \ref{control_law}, we need the controller gain matrix $K$ and the reference $\vec{r}$. Our objective is to find values of $K$ and $\vec{r}$ such that the pole will remain in a stable, upright state, and reach it as quickly as possible with minimal error.
 
 \subsection{Reference}
 
-The reference vector $r$ is easy to find: in the pole balancing problem, one usually wants to bring the angle, angular speed, position, and positional speed all to zero. This is a stable state, and centers the cart within the bounds of the track. Thus, we simply define $r$ as a vector of zeroes:
+The reference vector $\vec{r}$ is easy to find: in the pole balancing problem, one usually wants to bring the angle, angular speed, position, and positional speed all to zero. This is a stable state, and centers the cart within the bounds of the track. Thus, we simply define $\vec{r}$ as a vector of zeroes:
 
 \begin{equation}
     \displaystyle
-    r = \begin{bmatrix}
+    \vec{r} = \begin{bmatrix}
         0 \\
         0 \\
         0 \\
@@ -290,10 +290,12 @@ Rather than being trained as in a typical linear regression, an optimal value fo
 The cost function optimized is as follows:
 
 \begin{equation}
-    J = \int _0 ^{\infty} \! (x ^T Q x + u ^T R u) \, dt
+    J = \int _0 ^{\infty} \! (\vec{x} ^T Q \vec{x} + \vec{u} ^T R \vec{u}) \, dt
 \end{equation}
 
-$Q$ are diagonal matrices that define the costs of large errors for each of the states respectively. $R$ defines the cost of large values for each of the inputs. After using Bryson's rule \cite{veness}, and some empirical optimization, I settled on the following values for Q and R:
+$Q$ and $R$ are diagonal matrices that define the costs of large errors for each of the states and outputs, respectively. Specifically, the $k$th value in $Q$ defines the contribution to the loss function of the $k$th state.
+
+I used Bryson's rule \cite{veness}, which says that, for a given state with a maximum acceptable value of $z$, the loss coefficient should be $\displaystyle \frac{1}{z ^2}$. After some empirical optimization, I settled on the following values for Q and R:
 
 \begin{equation}
     Q = 40 \begin{bmatrix}
@@ -320,7 +322,7 @@ Given values for $Q$ and $R$, the optimal controller gain matrix $K$ was calcula
 The first time I implemented this system, I made two fundamental mistakes:
 
 \begin{itemize}
-    \item I thought that Equation \ref{state_derivative} yielded $x$ itself rather than $\dot x$, so I added the identity matrix to $A$.
+    \item I thought that Equation \ref{state_derivative} yielded $\vec{x}$ itself rather than $\dot{\vec{x}}$, so I added the identity matrix to $A$.
     \item I made the incorrect assumption, in my environment matrices, that $l$ was equal to 1.
 \end{itemize}
 
