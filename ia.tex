@@ -1,4 +1,4 @@
-\documentclass[12pt]{article}
+\documentclass[11pt]{article}
 
 \usepackage[margin=1in]{geometry}
 \usepackage{parskip}
@@ -132,7 +132,7 @@ I learned about state space control from a book \cite{veness} written by Tyler V
         Figure \ref{state_space} illustrates the flow of data as described by this equation.
         \begin{figure}[ht]
             \centering
-            \includegraphics[width=\textwidth]{state_space}
+            \includegraphics[width=0.5\textwidth]{state_space}
             \caption{\label{state_space} A flow chart describing changes in a state space environment.}
         \end{figure}
     \item The basic control law of state space is as follows:
@@ -177,8 +177,14 @@ Thankfully, I realized that $\theta$ will always be small (otherwise, the cart w
     \item The torque applied by gravity on the arm is equal to $\displaystyle \frac{\displaystyle g \sin \theta}{\displaystyle l}$, which can be linearly approximated as $\displaystyle \frac{\displaystyle g \theta}{\displaystyle l}$ for values of $\theta$ near 0.
     \item The torque applied by horizontal acceleration of the cart on the arm (assuming the arm is of negligible mass) is equal to $\displaystyle - \frac{\displaystyle F \cos \theta}{\displaystyle l}$, which can be linearly approximated as $\displaystyle - \frac{\displaystyle F}{\displaystyle l}$ for values of $\theta$ near 0.
     \item The acceleration applied to the cart by a force is simply equal to $\displaystyle \frac{\displaystyle F}{\displaystyle M + m}$ (once again, under the assumption that the pole mass is negligible).
-    \item The only dynamics other than gravity and force that must be modeled are the influences of the velocity states $\dot \theta$ and $\dot x _c$ on $\theta$ and $x _c$, respectively. These are obviously linear.
+    \item The only dynamics other than gravity and force that must be modeled are the influences of the velocity states $\dot \theta$ on $\theta$ and $\dot x _c$ on $x _c$. These are obviously linear.
 \end{itemize}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=\textwidth]{animation}
+    \caption{\label{animation} An example run of the simulation, showing that even during periods of fast movement, $\theta$ remains fairly small.}
+\end{figure}
 
 Thus, we have the following five linearized equations of motion, which define the changing state over one unit of time:
 
@@ -198,9 +204,15 @@ Thus, we have the following five linearized equations of motion, which define th
     \dot x _c := \displaystyle \dot x _c + \frac{\displaystyle F}{\displaystyle M + m}
 \end{equation}
 
-These linear equations very nicely map onto the following linear algebra equation (once again, over one time step):
+These linear equations are visualized in Figure \ref{arrows}, and can be equivalently represented as matrix multiplications in Equation \ref{state_representation}.
 
-\begin{equation}
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.5\textwidth]{arrows}
+    \caption{\label{arrows} Forces on the cart and the pole, visualized.}
+\end{figure}
+
+\begin{equation} \label{state_representation}
     \displaystyle
     \begin{bmatrix}
         \theta \\
@@ -292,6 +304,8 @@ The cost function optimized is as follows:
 \begin{equation}
     J = \int _0 ^{\infty} \! (\vec{x} ^T Q \vec{x} + \vec{u} ^T R \vec{u}) \, dt
 \end{equation}
+
+This amounts to a summation of the errors in the states and outputs from their references over an infinite period of time.
 
 $Q$ and $R$ are diagonal matrices that define the costs of large errors for each of the states and outputs, respectively. Specifically, the $k$th value in $Q$ defines the contribution to the loss function of the $k$th state.
 

@@ -45,8 +45,8 @@ K, _, _ = control.lqr(A, B, Q, R)
 
 # Switches for output modes
 log = False
-graph = True
-gui = False
+graph = False
+gui = True
 
 time_steps = int(10 / time_step)
 angle = 0
