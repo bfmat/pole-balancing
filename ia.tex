@@ -107,7 +107,7 @@ To make the model more easy to visualize and understand, I developed an animated
 For more precise static visualization of potential problems with control algorithms, I used Matplotlib \cite{matplotlib} to create plots over time of $x _c$, $\theta$, and $F$. These plots are seen in Figures \ref{position}, \ref{angle}, and \ref{force} at the end of this paper. Following are some specific issues this tool can help to shed light on:
 
 \begin{itemize}
-    \item Overshooting: when, rather than gradually settling to a stable equilibrium, the controller accelerates the cart and does not slow down enough to slow down and stop at 0. Mathematically, a controller that does not overshoot has a limit of 0 and is strictly increasing (if the starting $x _c$ is below 0) or strictly decreasing (if the starting $x _c$ is above 0).
+    \item Overshooting: when, rather than gradually settling to a stable equilibrium, the controller accelerates the cart and does not slow down enough to stop at the point of 0 error. Mathematically, a controller that does not overshoot has a limit of 0 error and is strictly increasing (if the starting $x _c$ is below 0) or strictly decreasing (if the starting $x _c$ is above 0).
     \item Excessive acceleration: rapid jumps or spikes in any of the variables in question may indicate strange and unwanted behavior, which may be attributable to poor parameter choices or modeling errors.
 \end{itemize}
 
@@ -129,7 +129,7 @@ I learned about state space control from a book \cite{veness} written by Tyler V
             \item The system matrix $A$ with size (states $\times$ states) defines how the states automatically change over time (in dynamics such as gravity).
             \item The input matrix $B$ with size (states $\times$ inputs) defines how the inputs provided by a control algorithm influence the changing states of the environment.
         \end{itemize}
-        Figure \ref{state_space} illustrates the flow of data as described by this equation.
+        Figure \ref{state_space} illustrates this flow of data: the state feeds back into itself through the system matrix $A$, and is influenced by the inputs through the input matrix $B$.
         \begin{figure}[ht]
             \centering
             \includegraphics[width=0.5\textwidth]{state_space}
@@ -179,12 +179,6 @@ Thankfully, I realized that $\theta$ will always be small (otherwise, the cart w
     \item The acceleration applied to the cart by a force is simply equal to $\displaystyle \frac{\displaystyle F}{\displaystyle M + m}$ (once again, under the assumption that the pole mass is negligible).
     \item The only dynamics other than gravity and force that must be modeled are the influences of the velocity states $\dot \theta$ on $\theta$ and $\dot x _c$ on $x _c$. These are obviously linear.
 \end{itemize}
-
-\begin{figure}[ht]
-    \centering
-    \includegraphics[width=\textwidth]{animation}
-    \caption{\label{animation} An example run of the simulation, showing that even during periods of fast movement, $\theta$ remains fairly small.}
-\end{figure}
 
 Thus, we have the following five linearized equations of motion, which define the changing state over one unit of time:
 
@@ -249,9 +243,9 @@ These linear equations are visualized in Figure \ref{arrows}, and can be equival
     \end{bmatrix}
 \end{equation}
 
-Thus, we have our values for $A$ and $B$:
+Thus, we have our values for $A$ and $B$ in Equations \ref{a} and \ref{b}:
 
-\begin{equation}
+\begin{equation} \label{a}
     \displaystyle A = \begin{bmatrix}
         0 & 1 & 0 & 0 \\
         \frac{g}{l} & 0 & 0 & 0 \\
@@ -260,7 +254,7 @@ Thus, we have our values for $A$ and $B$:
     \end{bmatrix}
 \end{equation}
 
-\begin{equation}
+\begin{equation} \label{b}
     \displaystyle B = \begin{bmatrix}
         0 \\
         - \frac{1}{l} \\
@@ -307,7 +301,7 @@ The cost function optimized is as follows:
 
 This amounts to a summation of the errors in the states and outputs from their references over an infinite period of time.
 
-$Q$ and $R$ are diagonal matrices that define the costs of large errors for each of the states and outputs, respectively. Specifically, the $k$th value in $Q$ defines the contribution to the loss function of the $k$th state.
+$Q$ and $R$ are diagonal matrices that define the costs of large errors for each of the states and outputs, respectively. Specifically, the $k$th value in $Q$ defines the contribution to the cost function of the $k$th state.
 
 I used Bryson's rule \cite{veness}, which says that, for a given state with a maximum acceptable value of $z$, the loss coefficient should be $\displaystyle \frac{1}{z ^2}$. After some empirical optimization, I settled on the following values for Q and R:
 
@@ -329,11 +323,17 @@ I used Bryson's rule \cite{veness}, which says that, for a given state with a ma
 
 Given values for $Q$ and $R$, the optimal controller gain matrix $K$ was calculated using the Python Control library.
 
-\section{Results}
-
 \subsection{Trial and Error}
 
-The first time I implemented this system, I made two fundamental mistakes:
+The first time I implemented this system, my selections of loss values were highly misguided and resulted in poor performance like that shown in figure \ref{fail}. After some manual optimization of loss parameters, I found that the controller functioned acceptably.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=\textwidth]{fail}
+    \caption{\label{fail} A failed test run, showing the results of a poorly designed cost function combined with environment matrix errors.}
+\end{figure}
+
+Despite these fixes, I later discovered that I made two fundamental mistakes:
 
 \begin{itemize}
     \item I thought that Equation \ref{state_derivative} yielded $\vec{x}$ itself rather than $\dot{\vec{x}}$, so I added the identity matrix to $A$.
@@ -342,11 +342,21 @@ The first time I implemented this system, I made two fundamental mistakes:
 
 Despite these errors, the controller still made all states converge to zero, which says something very significant about the robustness of closed-loop control systems. However, it was slow to approach zero. When I fixed these errors, the stability of the system and the rate of convergence drastically improved.
 
-\subsection{Results (Actually)}
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=\textwidth]{animation}
+    \caption{\label{animation} A successful example run of the simulation.}
+\end{figure}
 
-After these issues were fixed, and after some empirical tweaking of the cost matrices $Q$ and $R$, I found that the resulting controller gain matrix $K$ was a very nearly optimal solution to the environment, bringing the pole to the center of the track very rapidly and with very minimal overshoot. Indeed, within 10 seconds all variables have settled to values within a rounding error of zero.
+\section{Results}
+
+After all issues were fixed, I found that the resulting controller gain matrix $K$ was a very nearly optimal solution to the environment, bringing the pole to the center of the track very rapidly and with very minimal overshoot. Indeed, within 10 seconds all variables have settled to values within a rounding error of zero.
 
 Figures \ref{position}, \ref{angle}, and \ref{force} display this graphically. Raw numbers can be found in Table \ref{motion_statistics}. The beginning conditions were: $x _c = -8$ (quite close to the track boundary, which is at -10) and $\theta = 0$.
+
+Figure \ref{position} shows confirms that a well-optimized state space model can produce almost no overshoot. Figure \ref{angle} is interesting in particular because it proves that the controller is capable of managing relatively large angles with smooth acceleration and deceleration.
+
+Figure \ref{force} reveals the relatively large force used to accomplish this task; however, I found that with smaller force limits, the controller achieves similar performance, with marginally greater overshoot.
 
 \begin{center}
     \begin{tabular}{|l|l|l|l|}
@@ -355,11 +365,7 @@ Figures \ref{position}, \ref{angle}, and \ref{force} display this graphically. R
         \hline
         0.00 & -8.00 & 0.00 & -50.60 \\
         \hline
-        1.00 & -6.62 & 0.16 & 1.54 \\
-        \hline
         2.00 & -3.32 & -0.12 & -1.52 \\
-        \hline
-        3.00 & -1.14 & -0.13 & -1.40 \\
         \hline
         4.00 & -0.20 & -0.07 & -0.72 \\
         \hline
@@ -393,7 +399,9 @@ Figures \ref{position}, \ref{angle}, and \ref{force} display this graphically. R
 
 \section{Conclusions}
 
-These results confirm and demonstrate that linear state space control can indeed make for a robust solution to nonlinear physical environments such as the pole balancing problem. After expressing the environment as a set of linear matrices and applying the LQR optimizer, I have developed a controller that drives all states to the reference efficiently and with very minimal overshoot.
+After expressing the environment of the pole balancing problem as a set of linear matrices and applying the LQR optimizer, I have developed a controller that drives all states to the reference efficiently and with very minimal overshoot (as was observed in Figure \ref{animation}).
+
+These results confirm and demonstrate that linear state space control can not only make for a robust solution to nonlinear physical environments such as the pole balancing problem, but one that produces very smooth and consistent actions (as can be observed in the graphs above).
 
 The main implications of these results lie in how they can be expected to generalize to other nonlinear control tasks. As mentioned in Section \ref{problem}, the pole balancing problem has a great deal in common with problems such as bicycle control and humanoid robots, so this result may suggest that state space and LQR have applicability to those challenges.
 
@@ -402,5 +410,14 @@ State space is also used for other diverse subfields of physical control. For in
 In the future, I hope to investigate other applications for state space and LQR, such as autonomous vehicles. I also hope to learn more about nonlinear control algorithms, and understand where they can, and should, be used instead of linear control.
 
 \printbibliography
+
+\section*{Image Sources}
+
+Where not original, diagrams were used and adapted from:
+
+\begin{itemize}
+\item \begin{verbatim} https://en.wikipedia.org/wiki/State-space_representation \end{verbatim}
+\item \begin{verbatim} https://en.wikipedia.org/wiki/Inverted_pendulum \end{verbatim}
+\end{itemize}
 
 \end{document}
