@@ -36,9 +36,9 @@ def get_pos_accel(angle, angle_speed, angle_accel, force):
 
 
 # State space control matrices (linearized)
-A = np.array([[1, 1, 0, 0], [gravity / pole_length, 1, 0, 0], [0, 0, 1, 1], [0, 0, 0, 1]])
+A = np.array([[0, 1, 0, 0], [gravity / pole_length, 0, 0, 0], [0, 0, 0, 1], [0, 0, 0, 0]])
 B = np.array([[0], [-1 / pole_length], [0], [1 / (cart_mass + pole_mass)]])
-Q = 0.01 * np.diag([1 / (failure_angle ** 2), 1 / (3 ** 2), 1 / (100 ** 2), 1 / (20 ** 2)])
+Q = 40 * np.diag([1 / (failure_angle ** 2), 1 / (3 ** 2), 1 / (track_limit ** 2), 1 / (20 ** 2)])
 R = np.array([[1 / (10 ** 2)]])
 # Calculate LQR optimal control policy
 K, _, _ = control.lqr(A, B, Q, R)
@@ -123,7 +123,7 @@ class PoleSimulatorVisualizer(QWidget):
         self.show()
         self.timer = QTimer()
         self.timer.timeout.connect(self.update)
-        self.timer.start(time_step * 30000)
+        self.timer.start(time_step * 1000)
         self.data_iterator = zip(positions, angles)
         self.cart_pos = 0
         self.pole_angle = 0
@@ -155,3 +155,4 @@ if gui:
     app = QApplication([])
     ic = PoleSimulatorVisualizer()
     sys.exit(app.exec_())
+
